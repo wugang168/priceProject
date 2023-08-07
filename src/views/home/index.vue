@@ -14,6 +14,12 @@
     </div>
     <!-- 图 -->
     <div class="chart-box" ref="chart"></div>
+
+    <div>
+      <one :sData="chartData.data"></one>
+      <two :sData="chartData.data"></two>
+      <three :sData="chartData.data"></three>
+    </div>
   </div>
 </template>
 
@@ -23,28 +29,34 @@ import * as echarts from 'echarts'
 import { onMounted, ref } from 'vue'
 import { createKCartData } from '@/utils'
 import { parseCodeData } from '@/utils/parseData'
+
+
+import one from "@/components/one.vue"
+import two from "@/components/two.vue"
+import three from "@/components/three.vue"
+
 const data = createKCartData(1, 60)
 const chart = ref()
 
 const time = ref('')
 const code = ref('')
 let myChart = null
-let chartData = {}
+let chartData = ref({})
 
 const submitSearch = async () => {
   // 检查code time
-  if (!time.value || !code.value) {
-    console.log('请选择填写信息')
-    ElMessage({
-      message: '请选择填写信息',
-      type: 'warning'
-    })
-    return
-  }
+  // if (!time.value || !code.value) {
+  //   console.log('请选择填写信息')
+  //   ElMessage({
+  //     message: '请选择填写信息',
+  //     type: 'warning'
+  //   })
+  //   return
+  // }
 
   // 获取数据
   const { data } = await fetch(
-    '/api/v5/stock/chart/kline.json?symbol=SZ159766&begin=1690185428135&period=day&type=before&count=-808&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance&a=' +
+    '/api/v5/stock/chart/kline.json?symbol=SZ159995&begin=1690185428135&period=day&type=before&count=-808&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance&a=' +
       Math.random(),
     {
       method: 'get'
@@ -52,8 +64,10 @@ const submitSearch = async () => {
   ).then((res) => {
     return res.json()
   })
+  
   // 做数据解析
-  chartData = parseCodeData(data.item)
+  // chartData.value = parseCodeData(data.item, {startTime:"2022-05-10", endTime:"2022-07-01"})
+  chartData.value = parseCodeData(data.item, {startTime:"2022-09-07", endTime:"2023-04-10gggg'g'g'g'g'g'g'g'g'g'g'g'g'g'g'g'g'g'g"})
   initChart()
 }
 
@@ -70,7 +84,7 @@ const initChart = () => {
     },
     xAxis: {
       type: 'category',
-      data: chartData.time
+      data: chartData.value.time
     },
     yAxis: {
       type: 'value'
@@ -79,10 +93,14 @@ const initChart = () => {
       {
         name: '销量',
         type: 'line',
-        data: chartData.data
+        data: chartData.value.data
       }
     ]
   })
+}
+
+const oneBuy = () => {
+
 }
 </script>
 
@@ -93,7 +111,7 @@ const initChart = () => {
 }
 .chart-box {
   width: 600px;
-  height: 400px;
+  height: 500px;
   border: 1px solid green;
 }
 </style>

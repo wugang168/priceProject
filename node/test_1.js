@@ -1,12 +1,12 @@
 // 统计数据
-const statistiaData = (kChart) => {
+export const statistiaData = (kChart) => {
   /**
    * 定投方案：
    *  1.第一笔定投10000
-   *  2.没次定投1000 在阴线
-   *  3.当于第一次的价格,跌去5%位置,投入20000
-   *  4.当于第一次的价格.跌去10%位置,投入40000
-   *  5.当于第一次的价格,跌去20%位置,投入100000
+   *  2.没次定投500 在阴线
+   *  3.当于第一次的价格,跌去5%位置,投入10000
+   *  4.当于第一次的价格.跌去10%位置,投入20000
+   *  5.当于第一次的价格,跌去20%位置,投入40000
    */
   // 补仓记录
   const inData = []
@@ -34,8 +34,8 @@ const statistiaData = (kChart) => {
     }
 
     // 每次买入1000
-    total = total + 1000
-    share = share + 1000 / item
+    total = total + 500
+    share = share + 500 / item
 
     
 
@@ -45,22 +45,22 @@ const statistiaData = (kChart) => {
     if (xiaoshu > 0.05 && !flag.bf5) {
       console.log('触发了5%加入条件')
       flag.bf5 = true
-      total = total + 20000
-      share = share + 20000 / item
+      total = total + 10000
+      share = share + 10000 / item
     }
 
     if (xiaoshu > 0.1 && !flag.bf10) {
       console.log('触发了10%加入条件')
       flag.bf10 = true
-      total = total + 40000
-      share = share + 40000 / item
+      total = total + 20000
+      share = share + 20000 / item
     }
 
     if (xiaoshu > 0.2 && !flag.bf20) {
       console.log('触发了20%加入条件')
       flag.bf20 = true
-      total = total + 100000
-      share = share + 100000 / item
+      total = total + 60000
+      share = share + 60000 / item
     }
 
     // 每次计算盈利

@@ -9,13 +9,24 @@ export const formatTimeYYMMDD = (ns) => {
  * 做数据解析
  * @param {arr} data
  */
-export const parseCodeData = (data) => {
+export const parseCodeData = (data, filter) => {
   const xTime = []
   const yData = []
-  data.map((item) => {
-    xTime.push(formatTimeYYMMDD(item[0]))
-    yData.push(item[5])
-  })
+
+  if(filter.startTime && filter.endTime) {
+    data.map((item) => {
+      if(item[0] > new Date(filter.startTime).getTime() && item[0] < new Date(filter.endTime).getTime()) {
+        xTime.push(formatTimeYYMMDD(item[0]))
+        yData.push(item[5])
+      }
+    })
+  }else{
+    data.map((item) => {
+      xTime.push(formatTimeYYMMDD(item[0]))
+      yData.push(item[5])
+    })
+  }
+
   return {
     time: xTime,
     data: yData
@@ -26,7 +37,7 @@ export const parseCodeData = (data) => {
  * 定投: 必须定义一个预测的参考底部点位 [可以用前面的支持低位来参考]
  * 定投份额: 按照点位来分配
  *
- * 把日 和 月线的macd 金叉做参考 【看看日线和月线的macd有没有某种关系】
+ * 把日 和 周线的macd 金叉做参考 【看看日线和月线的macd有没有某种关系】
  *
  */
 
