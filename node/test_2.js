@@ -4,7 +4,7 @@
 
 // 买入的波动幅度 2%
 
-// 卖出的波动幅度 5% 
+// 卖出的波动幅度 5%
 
 // 先实现正常的定投模型
 /**
@@ -14,11 +14,10 @@
  * 4.每份金额（固定金额投入）
  */
 const buildGrid = (start, range, grid) => {
-
   const result = []
 
-  for(let i=0; i<=grid; i++) {
-    let price = (start - range*i)  
+  for (let i = 0; i <= grid; i++) {
+    let price = start - range * i
     result.push(price.toFixed(2))
   }
 
@@ -26,58 +25,65 @@ const buildGrid = (start, range, grid) => {
 }
 
 const findDataBuyPrice = (sData, price) => {
-  const findData = [];
+  const findData = []
   const otherData = []
   sData.map((item) => {
-    if(item.price < price){
+    if (item.price < price) {
       findData.push(item)
-    }else{
+    } else {
       otherData.push(item)
     }
   })
-  return {findData, otherData}
-}
-
-// 卖入的判断函数
-const buyTime = () => {
-
+  return { findData, otherData }
 }
 
 /**
- * 
+ *
  * @param {*} buyData 需要买入的价格设置
  * @param {*} sellData 需要卖出的价格设置
  */
-function BuildBuyOrSellTime (buyData=[], sellData=[]) {
-
+function BuildBuyOrSellTime(buyData = [], sellData = []) {
   this.cacheBuyPrice = {}
   this.buyData = buyData
   this.sellData = sellData
 
-
-  // 买入时机判断
-  // 判断传入的价格是否击穿了买入的价格刻度  一个价格刻度触发了买入需要标记
-  const checkedBuyTime = (price) => {
-    return this.buyData.some((item) => {
-      if(price <= item && !this.cacheBuyPrice[item]) {
-        this.cacheBuyPrice[item] = true 
-        return true;
+  // 卖出时机判断
+  const checkedSellTime = (price) => {
+    return this.sellData.some((item) => {
+      if (price >= item && this.cacheBuyPrice[item]) {
+        console.log('----------')
+        console.log(`价格为${price},触发涨幅${item}价格线卖出机会`)
+        this.cacheBuyPrice[item] = false
+        return true
       }
       return false
     })
   }
 
+  // 买入时机判断
+  // 判断传入的价格是否击穿了买入的价格刻度  一个价格刻度触发了买入需要标记
+  const checkedBuyTime = (price) => {
+    return this.buyData.some((item) => {
+      if (price <= item && !this.cacheBuyPrice[item]) {
+        console.log('----------')
+        console.log(`价格为${price},触发跌破${item}价格线买入机会`)
+        this.cacheBuyPrice[item] = true
+        return true
+      }
+      return false
+    })
+  }
 
   return {
-
+    checkedBuyTime,
+    checkedSellTime
   }
 }
 
-
+// 24235
 
 const wanggeFun = () => {
-
-  const startPrice = 1;
+  const startPrice = 1
   const range = 0.05
   const grids = 10
   const itemTotal = 10000
@@ -85,29 +91,90 @@ const wanggeFun = () => {
   // 生成买入和卖出网格点数
   const buyGrids = buildGrid(startPrice, range, grids)
 
-  console.log('打印网格数据看看',buyGrids)
+  console.log('打印网格数据看看', buyGrids)
+  const checkedObj = BuildBuyOrSellTime(buyGrids, buyGrids)
 
   // 股票的K线数据
   // const Kline = ['0.95', '0.90', '0.85', '0.80', '0.75', '0.70', '0.65','0.70', '0.60', '0.55', '0.50', '0.55', '0.60', '0.65', '0.70', '0.75', '0.80', '0.85', '0.90', '0.95', '1.00']
-  const Kline = ['0.95', '1.00', '0.95', '1.00', '0.95', '1.00', '0.95', '0.90', '0.85','0.80','0.75','0.70', '0.65', '0.70', '0.80','0.70','0.65', '0.60', '0.65', '0.60', '0.65', 
-  '0.60', '0.65', '0.60', '0.65','0.60', '0.65', '0.60', '0.65', '0.60', '0.65','0.60', '0.65', '0.70', '0.75', '0.80', '0.75', '0.70', '0.65', 
-  '0.60','0.55', '0.60', '0.55', '0.60', '0.55', '0.60','0.55', '0.60', '0.55', '0.60', '0.55', '0.60', '0.55', '0.60', '0.65', '0.70', '0.75', '0.80', '0.85', '0.90', '0.95', '1.00']
+  const Kline = [
+    '0.95',
+    '1.00',
+    '0.95',
+    '1.00',
+    '0.95',
+    '1.00',
+    '0.95',
+    '0.90',
+    '0.85',
+    '0.80',
+    '0.75',
+    '0.70',
+    '0.65',
+    '0.70',
+    '0.80',
+    '0.70',
+    '0.65',
+    '0.60',
+    '0.65',
+    '0.60',
+    '0.65',
+    '0.60',
+    '0.65',
+    '0.60',
+    '0.65',
+    '0.60',
+    '0.65',
+    '0.60',
+    '0.65',
+    '0.60',
+    '0.65',
+    '0.60',
+    '0.65',
+    '0.70',
+    '0.75',
+    '0.80',
+    '0.75',
+    '0.70',
+    '0.65',
+    '0.60',
+    '0.55',
+    '0.60',
+    '0.55',
+    '0.60',
+    '0.55',
+    '0.60',
+    '0.55',
+    '0.60',
+    '0.55',
+    '0.60',
+    '0.55',
+    '0.60',
+    '0.55',
+    '0.60',
+    '0.65',
+    '0.70',
+    '0.75',
+    '0.80',
+    '0.85',
+    '0.90',
+    '0.95',
+    '1.00'
+  ]
 
   // '0.85','0.80', '0.75', '0.70'
   // const Kline = ['0.90', '0.85', '0.90', '0.95']
 
-
   // 卖出次数
-  let sellNum = 0;
-  let buyNum = 0;
+  let sellNum = 0
+  let buyNum = 0
   // 总的投入金额
-  let buyTotalMoney = 0;
+  let buyTotalMoney = 0
 
   // 卖出的总金额
   let sellToalMoney = 0
-  
+
   // 卖出的总份额
-  let sellToTalLot = 0 
+  let sellToTalLot = 0
 
   // 总的份额
   let buyTotalLot = 0
@@ -122,23 +189,23 @@ const wanggeFun = () => {
   let prePrice = startPrice
 
   // 当天价格  如果当前价格小于上一天价格 触发买入检查  反之触发卖出检查
-  let curPrice = 0;
+  let curPrice = 0
 
-  for(let j=0; j<Kline.length; j++) {
+  for (let j = 0; j < Kline.length; j++) {
     curPrice = Kline[j]
     let isUp = curPrice > prePrice
-    
-    if(isUp) {
+
+    if (isUp) {
       // 卖出检查
-      if(buyGrids.includes(curPrice)){
-        console.log("触发了卖出信号----")
-        sellNum ++ 
+      if (checkedObj.checkedSellTime(curPrice)) {
+        console.log('触发了卖出信号----')
+        sellNum++
         // 找到需要卖的价格
-        const {findData, otherData} = findDataBuyPrice(buyLogs, curPrice)
+        const { findData, otherData } = findDataBuyPrice(buyLogs, curPrice)
         buyLogs = otherData
 
         // 统计份额
-        const currentTotal = findData.reduce((total, item)=>{
+        const currentTotal = findData.reduce((total, item) => {
           return total + item.total
         }, 0)
 
@@ -150,13 +217,21 @@ const wanggeFun = () => {
           price: curPrice,
           total: currentTotal
         })
-        console.log(`当天价格${curPrice} :上一天价格${prePrice},触发--卖出检查,卖出${currentTotal}份额, 卖出总份额${sellToTalLot}, 剩下${buyTotalLot - sellToTalLot}份额`)
-        console.log(`总卖出金额:${sellToalMoney}--总的份额:${sellToTalLot}--盈利金额${ sellToalMoney + curPrice * (buyTotalLot - sellToTalLot) - (buyTotalMoney)}`)
+        console.log(
+          `当天价格${curPrice} :上一天价格${prePrice},触发--卖出检查,卖出${currentTotal}份额, 卖出总份额${sellToTalLot}, 剩下${
+            buyTotalLot - sellToTalLot
+          }份额`
+        )
+        console.log(
+          `总卖出金额:${sellToalMoney}--总的份额:${sellToTalLot}--盈利金额${
+            sellToalMoney + curPrice * (buyTotalLot - sellToTalLot) - buyTotalMoney
+          }`
+        )
       }
-    }else{
+    } else {
       // 买入检查, 是否达到买入条件
-      if(buyGrids.includes(curPrice)){
-        console.log("触发了买入信号&&&&")
+      if (checkedObj.checkedBuyTime(curPrice)) {
+        console.log('触发了买入信号&&&&')
         let currentBuyLot = itemTotal / curPrice
         buyTotalLot = buyTotalLot + currentBuyLot
         buyTotalMoney = buyTotalMoney + itemTotal
@@ -164,23 +239,28 @@ const wanggeFun = () => {
           price: curPrice, //买入时的价格
           total: itemTotal / curPrice //买入了多少份额
         })
-        buyNum ++
-        console.log(`当天价格${curPrice} :上一天价格${prePrice},触发--买入检查,买入${itemTotal / curPrice}份额`)
-        console.log(`总投入金额:${buyTotalMoney}--总的份额:${buyTotalLot}--盈利金额${ sellToalMoney + curPrice * (buyTotalLot - sellToTalLot) - (buyTotalMoney)}`)
+        buyNum++
+        console.log(
+          `当天价格${curPrice} :上一天价格${prePrice},触发--买入检查,买入${
+            itemTotal / curPrice
+          }份额`
+        )
+        console.log(
+          `总投入金额:${buyTotalMoney}--总的份额:${buyTotalLot}--盈利金额${
+            sellToalMoney + curPrice * (buyTotalLot - sellToTalLot) - buyTotalMoney
+          }`
+        )
       }
     }
-    
+
     console.log('------------------')
     prePrice = curPrice
   }
 
-  console.log("查看买入日志")
-  console.log("中共卖出", sellNum)
-  console.log("买入次数", buyNum)
+  console.log('查看买入日志')
+  console.log('中共卖出', sellNum)
+  console.log('买入次数', buyNum)
   console.log(buyLogs)
 }
 
 wanggeFun()
-
-
-
