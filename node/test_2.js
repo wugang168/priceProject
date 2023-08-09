@@ -15,12 +15,24 @@
  */
 const buildGrid = (start, range, grid) => {
   const result = []
+  console.log("看看", start, range)
 
   for (let i = 0; i <= grid; i++) {
     let price = start - range * i
-    result.push(price.toFixed(2))
+    result.push(price.toFixed(3))
   }
+  return result
+}
 
+const buildGrid_two = (start, range, grid) => {
+  const result = []
+  console.log("看看", start, range)
+  let prevPrice = start;
+  for (let i = 0; i <= grid; i++) {
+    let price = prevPrice - prevPrice * range
+    prevPrice = price
+    result.push(price.toFixed(3))
+  }
   return result
 }
 
@@ -82,87 +94,24 @@ function BuildBuyOrSellTime(buyData = [], sellData = []) {
 
 // 24235
 
-const wanggeFun = () => {
-  const startPrice = 1
-  const range = 0.05
+export const wanggeFun = (sPrice, skline, srange=0.05) => {
+  let startPrice =sPrice
+  const range = srange
   const grids = 10
   const itemTotal = 10000
 
   // 生成买入和卖出网格点数
-  const buyGrids = buildGrid(startPrice, range, grids)
+  // const buyGrids = buildGrid(startPrice, sPrice * srange, grids)
+  const buyGrids =  buildGrid_two(startPrice, srange, grids)
 
   console.log('打印网格数据看看', buyGrids)
-  const checkedObj = BuildBuyOrSellTime(buyGrids, buyGrids)
+  const checkedObj = new BuildBuyOrSellTime(buyGrids, buyGrids)
 
   // 股票的K线数据
   // const Kline = ['0.95', '0.90', '0.85', '0.80', '0.75', '0.70', '0.65','0.70', '0.60', '0.55', '0.50', '0.55', '0.60', '0.65', '0.70', '0.75', '0.80', '0.85', '0.90', '0.95', '1.00']
-  const Kline = [
-    '0.95',
-    '1.00',
-    '0.95',
-    '1.00',
-    '0.95',
-    '1.00',
-    '0.95',
-    '0.90',
-    '0.85',
-    '0.80',
-    '0.75',
-    '0.70',
-    '0.65',
-    '0.70',
-    '0.80',
-    '0.70',
-    '0.65',
-    '0.60',
-    '0.65',
-    '0.60',
-    '0.65',
-    '0.60',
-    '0.65',
-    '0.60',
-    '0.65',
-    '0.60',
-    '0.65',
-    '0.60',
-    '0.65',
-    '0.60',
-    '0.65',
-    '0.60',
-    '0.65',
-    '0.70',
-    '0.75',
-    '0.80',
-    '0.75',
-    '0.70',
-    '0.65',
-    '0.60',
-    '0.55',
-    '0.60',
-    '0.55',
-    '0.60',
-    '0.55',
-    '0.60',
-    '0.55',
-    '0.60',
-    '0.55',
-    '0.60',
-    '0.55',
-    '0.60',
-    '0.55',
-    '0.60',
-    '0.65',
-    '0.70',
-    '0.75',
-    '0.80',
-    '0.85',
-    '0.90',
-    '0.95',
-    '1.00'
-  ]
 
-  // '0.85','0.80', '0.75', '0.70'
-  // const Kline = ['0.90', '0.85', '0.90', '0.95']
+  const Kline = skline
+  console.log(Kline)
 
   // 卖出次数
   let sellNum = 0
@@ -263,4 +212,4 @@ const wanggeFun = () => {
   console.log(buyLogs)
 }
 
-wanggeFun()
+// wanggeFun()
