@@ -24,7 +24,7 @@ export const parseCodeData = (data, filter) => {
         yData.push(item[5])
         fData.push({
           price: item[5],
-          time: item[0]
+          time: formatTimeYYMMDD(item[0])
         })
       }
     })
@@ -34,7 +34,7 @@ export const parseCodeData = (data, filter) => {
       yData.push(item[5])
       fData.push({
         price: item[5],
-        time: item[0]
+        time: formatTimeYYMMDD(item[0])
       })
     })
   }

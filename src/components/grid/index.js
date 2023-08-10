@@ -38,7 +38,7 @@ function BuildBuyOrSellTime(buyData = [], sellData = []) {
       if (price <= item && !this.cacheBuyPrice[item]) {
         console.log('----------')
         console.log(`价格为${price},触发跌破${item}价格线买入机会`)
-        this.cacheBuyPrice[item] = true
+        this.cacheBuyPrice[item ] = true
         return true
       }
       return false
@@ -67,16 +67,35 @@ const findDataBuyPrice = (sData, price) => {
       otherData.push(item)
     }
   })
-  if (findData.length === 1) {
+  if (findData.length === 1 || findData.length === 0) {
+    console.log("这里看看找到的是什么类型", findData)
     return { findData, otherData }
   } else {
+    console.log("是")
     const sortFindData = findData.sort((a, b) => b.price - a.price)
-    findData = sortFindData.shift()
+
+    findData = [sortFindData.shift()]
+
     otherData = [...sortFindData, ...otherData]
     // 找到最小价格
     return { findData, otherData }
   }
 }
+
+// const findDataBuyPrice = (sData, price) => {
+//   const findData = []
+//   const otherData = []
+//   sData.map((item) => {
+//     console.log(item.price, price)
+//     if (item.price < price) {
+//       console.log('---------------有找到的')
+//       findData.push(item)
+//     } else {
+//       otherData.push(item)
+//     }
+//   })
+//   return { findData, otherData }
+// }
 
 /**
  * 构建计算模型
@@ -90,10 +109,15 @@ export const runtimeFun = (
   let { startPrice, buyRange, sellRange, grid, buyAmount } = setting
   // 创建买入和卖出网格点
   let buyGrid = createBuyGridGrand(startPrice, buyRange, grid)
+  // let buyGrid = createBuyGrid(startPrice, buyRange, grid)
   let sellGrid = createSellGrid(buyGrid, sellRange)
+  // let sellGrid = buyGrid
+
+  console.log(buyGrid)
+  console.log(sellGrid)
 
   // 根据买入和卖出网格 做操作判断
-  let buyAndSell = BuildBuyOrSellTime(buyGrid, sellGrid)
+  let buyAndSell = new BuildBuyOrSellTime(buyGrid, sellGrid)
 
   // 卖出次数
   let sellNum = 0
@@ -124,67 +148,82 @@ export const runtimeFun = (
   // 时间
   let timeArr = []
 
+  let prvePrice = startPrice
+
   for (let i = 0; i < kData.length; i++) {
     const { price, time } = kData[i]
     priceArr.push(price)
     timeArr.push(time)
+    
+    let isUp = price > prvePrice
 
     const currentPrice = price
 
-    // 买入检查
-    if (buyAndSell.checkedBuyTime(currentPrice)) {
-      let buyLot = buyAmount / currentPrice
-      buyTotalMoney = buyTotalMoney + buyAmount
-      buyTotalLot = buyTotalLot + buyLot
-
-      // 买入记录
-      buyLogs.push({
-        price: currentPrice,
-        lot: buyLot,
-        time: time
-      })
-      historyLogs.push({
-        price: currentPrice,
-        lot: buyLot,
-        time: time
-      })
-
-      buyNum++
-      console.log(`${time}当天价格${currentPrice},触发--买入${buyLot}份,金额--${buyAmount}`)
-    }
-
-    // 卖出检查
-    /**
-     * 这里的卖出可以有两种方式来做，
-     *  1.一买 一卖
-     *  2.一买 多买 [买入和卖出波动不一样]
-     */
-    if (buyAndSell.checkedSellTime(currentPrice)) {
+    if(isUp) {
+      console.log("走到了这里来了")
       // 卖出检查
-      sellNum++
-      const { findData, otherData } = findDataBuyPrice(buyLogs, currentPrice)
-      buyLogs = otherData
+      /**
+       * 这里的卖出可以有两种方式来做，
+       *  1.一买 一卖
+       *  2.一买 多买 [买入和卖出波动不一样]
+       */
+      if (buyAndSell.checkedSellTime(currentPrice)) {
 
-      // 统计当次要卖出的份额
-      const currentSellLot = findData.reduce((total, item) => {
-        return total + item.lot
-      }, 0)
+        console.log('===============================')
+        // 卖出检查
+        sellNum++
+        const { findData, otherData } = findDataBuyPrice(buyLogs, currentPrice)
+        buyLogs = otherData
 
-      sellToalMoney = sellToalMoney + currentSellLot * currentPrice
+        console.log("看看找到的数据对不对", findData)
 
-      sellToTalLot = sellToTalLot + currentSellLot
+        // 统计当次要卖出的份额
+        const currentSellLot = findData.reduce((total, item) => {
+          return total + item.lot
+        }, 0)
 
-      sellLogs.push({
-        price: currentPrice,
-        lot: currentSellLot,
-        time: time
-      })
-      console.log(
-        `${time}当天价格${currentPrice},触发--卖出份额${currentSellLot},金额--${
-          currentSellLot * currentPrice
-        }`
-      )
+        sellToalMoney = sellToalMoney + currentSellLot * currentPrice
+
+        sellToTalLot = sellToTalLot + currentSellLot
+
+        sellLogs.push({
+          price: currentPrice,
+          lot: currentSellLot,
+          time: time
+        })
+        console.log(
+          `${time}当天价格${currentPrice},触发--卖出份额${currentSellLot},金额--${
+            currentSellLot * currentPrice
+          }`
+        )
+      }
+    }else{
+      // 买入检查
+      if (buyAndSell.checkedBuyTime(currentPrice)) {
+        let buyLot = buyAmount / currentPrice
+        buyTotalMoney = buyTotalMoney + buyAmount
+        buyTotalLot = buyTotalLot + buyLot
+
+        // 买入记录
+        buyLogs.push({
+          price: currentPrice,
+          lot: buyLot,
+          time: time
+        })
+        historyLogs.push({
+          price: currentPrice,
+          lot: buyLot,
+          time: time
+        })
+
+        buyNum++
+        console.log(`${time}当天价格${currentPrice},触发--买入${buyLot}份,金额--${buyAmount}`)
+      }
     }
+
+    
+    prvePrice = price
+    
 
     profitTotal = sellToalMoney + currentPrice * (buyTotalLot - sellToTalLot) - buyTotalMoney
     diffBuyOrSell.push(buyNum - sellNum)

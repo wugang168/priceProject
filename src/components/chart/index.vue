@@ -61,9 +61,9 @@ const initChart = () => {
     },
     yAxis: {
       type: 'value',
-      interval: 0.05,
-      min: 0.7,
-      max: 1.5,
+      interval: 0.2,
+      // min: 0.9,
+      // max: 1.7,
       splitLine: {
         lineStyle: {
           type: 'dotted'

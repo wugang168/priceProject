@@ -12,9 +12,9 @@ import { onMounted, ref } from 'vue'
 const chart = ref()
 let myChart = null
 onMounted(() => {
-  myChart = echarts.init(chart.value)
+  // myChart = echarts.init(chart.value)
 
-  initChart()
+  // initChart()
 })
 
 const initChart = () => {

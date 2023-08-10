@@ -1,6 +1,8 @@
 <template>
   <div class="grid-wrap">
-    <div class="left block"></div>
+    <div class="left block">
+      <Chart :result="result"></Chart>
+    </div>
     <div class="right">
       <div class="form-box block">
         <el-form
@@ -88,10 +90,54 @@
 </template>
 
 <script setup>
-const result = {}
-const formData = {
-  startTime: '',
-  endTime: ''
+import {reactive, ref } from "vue"
+import { parseCodeData } from '@/utils/parseData'
+import { formatYYYYMMDD } from '@/utils/tools.js'
+import Chart from '@/components/chart/index.vue'
+import { runtimeFun } from '@/components/grid/index.js'
+const result = ref({})
+const formData = reactive({
+  code: 'SH515790',
+  startPrice: 1.44,
+  buyRange: 0.05,
+  sellRange: 0.05,
+  grid: 20,
+  buyAmount: 10000,
+  startTime: '2022-12-02',
+  endTime: '2023-01-31'
+})
+const chartData = ref({})
+
+const confirm = async () => {
+
+  console.log("kankan")
+  console.log(formData)
+
+  // 获取数据
+  const { data } = await fetch(
+    `/api/v5/stock/chart/kline.json?symbol=${formData.code}&begin=1690185428135&period=day&type=before&count=-808&indicator=kline,pe,pb,ps,pcf,market_capital,agt,ggt,balance&a=` +
+      Math.random(),
+    {
+      method: 'get'
+    }
+  ).then((res) => {
+    return res.json()
+  })
+
+  // 做数据解析
+  chartData.value = parseCodeData(data.item, {
+    startTime: formatYYYYMMDD(formData.startTime),
+    endTime: formatYYYYMMDD(formData.endTime)
+  })
+  console.log("看看获取的数据是什么样的", chartData.value)
+
+ result.value = runtimeFun(chartData.value.fData, {
+    startPrice: formData.startPrice,
+    buyRange: formData.buyRange,
+    sellRange: formData.sellRange,
+    grid: formData.grid,
+    buyAmount: formData.buyAmount
+  })
 }
 </script>
 
