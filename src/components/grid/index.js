@@ -74,7 +74,7 @@ const findDataBuyPrice = (sData, price) => {
     findData = sortFindData.shift()
     otherData = [...sortFindData, ...otherData]
     // 找到最小价格
-    return { findData }
+    return { findData, otherData }
   }
 }
 
@@ -91,6 +91,7 @@ export const runtimeFun = (
   // 创建买入和卖出网格点
   let buyGrid = createBuyGridGrand(startPrice, buyRange, grid)
   let sellGrid = createSellGrid(buyGrid, sellRange)
+
   // 根据买入和卖出网格 做操作判断
   let buyAndSell = BuildBuyOrSellTime(buyGrid, sellGrid)
 
@@ -108,14 +109,27 @@ export const runtimeFun = (
 
   // 买入的记录日志
   let buyLogs = []
+  let historyLogs = []
   // 卖出的记录日志
   let sellLogs = []
 
   // 记录买入和卖出的差值变化
   let diffBuyOrSell = []
 
+  // 盈利金额
+  let profitTotal = 0
+
+  // 价格
+  let priceArr = []
+  // 时间
+  let timeArr = []
+
   for (let i = 0; i < kData.length; i++) {
-    const currentPrice = kData[i]
+    const { price, time } = kData[i]
+    priceArr.push(price)
+    timeArr.push(time)
+
+    const currentPrice = price
 
     // 买入检查
     if (buyAndSell.checkedBuyTime(currentPrice)) {
@@ -126,11 +140,17 @@ export const runtimeFun = (
       // 买入记录
       buyLogs.push({
         price: currentPrice,
-        lot: buyLot
+        lot: buyLot,
+        time: time
+      })
+      historyLogs.push({
+        price: currentPrice,
+        lot: buyLot,
+        time: time
       })
 
       buyNum++
-      console.log(`当天价格${currentPrice},触发--买入${buyLot}份`)
+      console.log(`${time}当天价格${currentPrice},触发--买入${buyLot}份,金额--${buyAmount}`)
     }
 
     // 卖出检查
@@ -142,16 +162,94 @@ export const runtimeFun = (
     if (buyAndSell.checkedSellTime(currentPrice)) {
       // 卖出检查
       sellNum++
-      console.log(`当天价格${currentPrice},触发--卖出份额`)
+      const { findData, otherData } = findDataBuyPrice(buyLogs, currentPrice)
+      buyLogs = otherData
+
+      // 统计当次要卖出的份额
+      const currentSellLot = findData.reduce((total, item) => {
+        return total + item.lot
+      }, 0)
+
+      sellToalMoney = sellToalMoney + currentSellLot * currentPrice
+
+      sellToTalLot = sellToTalLot + currentSellLot
+
+      sellLogs.push({
+        price: currentPrice,
+        lot: currentSellLot,
+        time: time
+      })
+      console.log(
+        `${time}当天价格${currentPrice},触发--卖出份额${currentSellLot},金额--${
+          currentSellLot * currentPrice
+        }`
+      )
     }
 
-    console.log(
-      `总买入金额: ${buyTotalMoney}--总卖出金额:${sellToalMoney}------盈利${
-        sellToalMoney + currentPrice * (buyTotalLot - sellToTalLot) - buyTotalMoney
-      }`
-    )
+    profitTotal = sellToalMoney + currentPrice * (buyTotalLot - sellToTalLot) - buyTotalMoney
     diffBuyOrSell.push(buyNum - sellNum)
+    console.log(`总买入金额: ${buyTotalMoney}--总卖出金额:${sellToalMoney}------盈利${profitTotal}`)
   }
 
-  return {}
+  const maxDiff = Math.max(...diffBuyOrSell)
+
+  return {
+    maxDiff,
+    buyNum,
+    sellNum,
+    buyGrid,
+    sellGrid,
+    buyTotalMoney,
+    buyTotalLot,
+    sellToalMoney,
+    sellToTalLot,
+    profitTotal,
+    sellLogs,
+    historyLogs,
+    priceArr,
+    timeArr
+  }
+}
+
+/**
+ * 网格线数据生成
+ * @param {array} sData  y轴数据
+ * @param {string} color 颜色
+ * @param {string} name  名称
+ * @returns
+ */
+export const createMarkLine = (sData, color, name) => {
+  return sData.map((item) => {
+    return {
+      name: name,
+      yAxis: item,
+      label: {
+        color: color
+      },
+      lineStyle: {
+        color: color
+      }
+    }
+  })
+}
+
+/**
+ * 生成卖出 和 买入 散点数据
+ * @param {array} sData [{price: 1.2, time: '时间戳'}]
+ * @param {string} color
+ * @param {sring} name
+ */
+export const createBuyOrSellScatter = (sData, color, name) => {
+  const data = sData.map((item) => {
+    return [item.time, item.price]
+  })
+  return {
+    name: name,
+    symbolSize: 10,
+    type: 'scatter',
+    itemStyle: {
+      color: color
+    },
+    data: data
+  }
 }

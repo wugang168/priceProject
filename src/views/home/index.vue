@@ -63,7 +63,7 @@ let chartData = ref({})
 
 const codeList = [
   {
-    code: 'sz159766',
+    code: 'SH512010',
     name: ''
   }
 ]

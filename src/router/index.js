@@ -8,6 +8,11 @@ const router = createRouter({
       name: 'price',
       component: () => import('../views/home/index.vue')
     },
+    {
+      path: '/grid',
+      name: 'grid',
+      component: () => import('../views/grid/index.vue')
+    }
   ]
 })
 

@@ -12,24 +12,37 @@ export const formatTimeYYMMDD = (ns) => {
 export const parseCodeData = (data, filter) => {
   const xTime = []
   const yData = []
+  const fData = []
 
-  if(filter.startTime && filter.endTime) {
+  if (filter.startTime && filter.endTime) {
     data.map((item) => {
-      if(item[0] > new Date(filter.startTime).getTime() && item[0] < new Date(filter.endTime).getTime()) {
+      if (
+        item[0] > new Date(filter.startTime).getTime() &&
+        item[0] < new Date(filter.endTime).getTime()
+      ) {
         xTime.push(formatTimeYYMMDD(item[0]))
         yData.push(item[5])
+        fData.push({
+          price: item[5],
+          time: item[0]
+        })
       }
     })
-  }else{
+  } else {
     data.map((item) => {
       xTime.push(formatTimeYYMMDD(item[0]))
       yData.push(item[5])
+      fData.push({
+        price: item[5],
+        time: item[0]
+      })
     })
   }
 
   return {
     time: xTime,
-    data: yData
+    data: yData,
+    fData: fData
   }
 }
 
