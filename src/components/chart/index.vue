@@ -78,12 +78,12 @@ const initChart = () => {
         symbol: 'circle',
         lineStyle: {
           width: 1
-        },
-        markLine: {
-          symbol: 'none',
-          data: markLineData,
-          silent: true
         }
+        // markLine: {
+        //   symbol: 'none',
+        //   data: markLineData,
+        //   silent: true
+        // }
       },
       buyScatterData,
       sellScatterData

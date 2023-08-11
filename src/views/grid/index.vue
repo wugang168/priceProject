@@ -25,10 +25,10 @@
             <el-input v-model.number="formData.sellRange" />
           </el-form-item>
           <el-form-item style="width: 48%" label="网格数" prop="grid">
-            <el-input v-model="formData.grid" />
+            <el-input v-model.number="formData.grid" />
           </el-form-item>
           <el-form-item style="width: 48%" label="金额" prop="buyAmount">
-            <el-input v-model="formData.buyAmount" />
+            <el-input v-model.number="formData.buyAmount" />
           </el-form-item>
           <el-form-item style="width: 48%" label="开始时间" prop="startTime">
             <el-date-picker
@@ -90,11 +90,11 @@
 </template>
 
 <script setup>
-import {reactive, ref } from "vue"
+import { reactive, ref } from 'vue'
 import { parseCodeData } from '@/utils/parseData'
 import { formatYYYYMMDD } from '@/utils/tools.js'
 import Chart from '@/components/chart/index.vue'
-import { runtimeFun } from '@/components/grid/index.js'
+import { runtimeFun } from './index.js'
 const result = ref({})
 const formData = reactive({
   code: 'SH515790',
@@ -109,8 +109,7 @@ const formData = reactive({
 const chartData = ref({})
 
 const confirm = async () => {
-
-  console.log("kankan")
+  console.log('kankan')
   console.log(formData)
 
   // 获取数据
@@ -129,9 +128,8 @@ const confirm = async () => {
     startTime: formatYYYYMMDD(formData.startTime),
     endTime: formatYYYYMMDD(formData.endTime)
   })
-  console.log("看看获取的数据是什么样的", chartData.value)
 
- result.value = runtimeFun(chartData.value.fData, {
+  result.value = runtimeFun(chartData.value.fData, {
     startPrice: formData.startPrice,
     buyRange: formData.buyRange,
     sellRange: formData.sellRange,
