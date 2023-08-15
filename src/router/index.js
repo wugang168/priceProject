@@ -12,6 +12,11 @@ const router = createRouter({
       path: '/grid',
       name: 'grid',
       component: () => import('../views/grid/index.vue')
+    },
+    {
+      path: '/tools',
+      name: 'tools',
+      component: () => import('../views/tools/index.vue')
     }
   ]
 })
